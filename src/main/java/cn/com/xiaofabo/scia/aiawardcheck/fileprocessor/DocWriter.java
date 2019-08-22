@@ -37,8 +37,8 @@ public class DocWriter {
 	public static final BigInteger PAGE_NUMBER_START = BigInteger.valueOf(0L);
 	public static final BigInteger TEXT_LINE_SPACING = BigInteger.valueOf(500L);
 
-	public static final BigInteger TABLE_KEY_WIDTH = BigInteger.valueOf(3005L);    /// ~4.0cm
-	public static final BigInteger TABLE_VALUE_WIDTH = BigInteger.valueOf(5216L);  /// ~10.5cm
+	public static final BigInteger TABLE_KEY_WIDTH = BigInteger.valueOf(4111L);    /// ~4.0cm
+	public static final BigInteger TABLE_VALUE_WIDTH = BigInteger.valueOf(4111L);  /// ~10.5cm
 
 	/// Default font size
 	public static final BigInteger DEFAULT_FONT_SIZE_HALF_16 = BigInteger.valueOf(32L);

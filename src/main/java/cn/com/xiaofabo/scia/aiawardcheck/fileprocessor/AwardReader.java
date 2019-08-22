@@ -2,6 +2,7 @@ package cn.com.xiaofabo.scia.aiawardcheck.fileprocessor;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -49,7 +50,7 @@ public class AwardReader extends DocReader {
 	private static final String REGEX_ARBIOP_REQUEST_TEXT_TITLE = "）关于申请人的仲裁请求";
 	private static final String REGEX_ARBIOP_COUNTER_REQUEST_TEXT_TITLE = "）关于被申请人的仲裁反请求";
 	private static final String REGEX_ARBIOP_RESPONDENT_ABSENT_TEXT_TITLE = "）被申请人缺席的法律后果";
-
+	private static final String CAIJUE_START = "仲裁庭对本案作出裁决如下";
 	private static final String END = "仲裁员：";
 
 	private final List<Party> partyList;
@@ -203,10 +204,38 @@ public class AwardReader extends DocReader {
 		/// 二、仲裁庭意见
 		award = divideArbiOpinionText(award, arbiOpinionText);
 		/// 三、裁 决
+		dealArbitramentText(arbitramentText);
 		award.setArbitramentText(arbitramentText);
+		dealEndTable(endTable);
 		award.setFootText(endTable);
 
 		return award;
+	}
+
+	private static void dealArbitramentText(List<String> list){
+		for (int i = 0; i < list.size(); i ++){
+			if (list.get(i).contains(CAIJUE_START)){
+				continue;
+			}
+			if (list.get(i).startsWith("    （") || list.get(i).startsWith("    (")
+					|| list.get(i).replaceAll("\\s*","").startsWith("（")
+					|| list.get(i).replaceAll("\\s*","").startsWith("(")){
+				return;
+			}
+			list.set(i, "    （" + DocUtil.numberToCN(i)+"）"+list.get(i));
+		}
+	}
+
+	private static void dealEndTable(List<String> list){
+		for (Iterator<String> ite = list.iterator(); ite.hasNext();) {
+			String str = ite.next();
+			try{
+				Integer.parseInt(str);
+				ite.remove();
+			} catch (Exception e){
+				// do nothing
+			}
+		}
 	}
 
 	private void readParties(String[] lines) {
@@ -238,11 +267,11 @@ public class AwardReader extends DocReader {
 					String value = line;
 					Pair pair = party.getProperty(currentPairIndex);
 					if (!StringUtils.isEmpty(CommonUtil.replaceBlank(value))){
-						pair.setValue(party.getProperty(currentPairIndex).getValue() + "\n" + value);
+						pair.setValue(party.getProperty(currentPairIndex).getValue() + "\n\n" + value);
 					}
 				} else {
 					String key = line.substring(0, line.indexOf("："));
-					String value = line.substring(line.indexOf("：") + 1) + "\n";
+					String value = line.substring(line.indexOf("：") + 1);
 					party.addProperty(new Pair(key, value));
 					++currentPairIndex;
 				}

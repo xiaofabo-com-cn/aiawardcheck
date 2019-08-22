@@ -39,6 +39,7 @@ import cn.com.xiaofabo.scia.aiawardcheck.entity.Award;
 import cn.com.xiaofabo.scia.aiawardcheck.entity.Pair;
 import cn.com.xiaofabo.scia.aiawardcheck.entity.Party;
 import cn.com.xiaofabo.scia.aiawardcheck.entity.Routine;
+import org.springframework.util.CollectionUtils;
 
 public class AwardWriter extends DocWriter {
 
@@ -267,8 +268,11 @@ public class AwardWriter extends DocWriter {
 		int arbiOpSubSectionIndex = 1;
 
 		/// 仲裁庭查明及认定的事实
-		addTitleTextParagraph("（" + DocUtil.numberToCN(arbiOpSubSectionIndex++) + "）仲裁庭查明及认定的事实", 0);
-		addNormalTextParagraphs(award.getArbiOpFactText(), 0, 1, ParagraphAlignment.BOTH);
+		if (!CollectionUtils.isEmpty(award.getArbiOpFactText())){
+			addTitleTextParagraph("（" + DocUtil.numberToCN(arbiOpSubSectionIndex++) + "）仲裁庭查明及认定的事实", 0);
+			addNormalTextParagraphs(award.getArbiOpFactText(), 0, 1, ParagraphAlignment.BOTH);
+		}
+
 
 		/// 关于本案法律适用问题（涉外案件）
 		if (award.isForeignCase()) {
@@ -309,7 +313,7 @@ public class AwardWriter extends DocWriter {
 		/* -----------------------------分------割------线----------------------------- */
 		/// 裁决
 		addSubTitle("三、裁   决");
-		addNormalTextParagraphs(award.getArbitramentText(), 1, 1);
+		addNormalTextParagraphs(award.getArbitramentText(), 1, 1, ParagraphAlignment.LEFT);
 
 		addFootText(award.getFootText());
 	}
@@ -388,7 +392,7 @@ public class AwardWriter extends DocWriter {
 		spacing.setLineRule(STLineSpacingRule.EXACT);
 		spacing.setLine(TEXT_LINE_SPACING);
 
-		paragraph.setAlignment(ParagraphAlignment.LEFT);
+		paragraph.setAlignment(ParagraphAlignment.BOTH);
 		paragraph.setFirstLineIndent(CN_FONT_SIZE_SAN * 2 * 20);
 		XWPFRun run = paragraph.createRun();
 		run.setFontFamily(FONT_FAMILY_FANGSONG);
